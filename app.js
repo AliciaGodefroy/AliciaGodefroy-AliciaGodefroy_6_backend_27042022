@@ -3,7 +3,11 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 const dotenv = require("dotenv");
+const rateLimit = require('express-rate-limit');
+const helmet = require("helmet");
 dotenv.config();
+
+//Changement test
 
 const Sauce = require('./models/sauce');
 
@@ -17,6 +21,14 @@ mongoose.connect(process.env.SECRET_DB,
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 const app = express();
+app.use(helmet());
+
+//Mesure de sécurité avec express-rate-limite
+const limiter = rateLimit({
+  windowMS: 15 * 60 * 1000, // Fenêtre de 15min
+  max: 20, // on limite chaque adresse IP à 20 appels (requests) par fenêtre de 15min
+});
+app.use(limiter);
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
