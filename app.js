@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const dotenv = require("dotenv");
 const rateLimit = require('express-rate-limit');
-const helmet = require("helmet");
+// const helmet = require("helmet");
 dotenv.config();
 
 //Changement test
@@ -21,7 +21,7 @@ mongoose.connect(process.env.SECRET_DB,
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 const app = express();
-app.use(helmet());
+// app.use(helmet());
 
 //Mesure de sécurité avec express-rate-limite
 const limiter = rateLimit({
@@ -40,9 +40,9 @@ app.use((req, res, next) => {
 app.use(bodyParser.json()); //Donne accès au corps de la requête
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
-helmet({
-  crossOriginResourcePolicy: false,
-}),
+// helmet({
+//   crossOriginResourcePolicy: false,
+// }),
 
 app.use('/api/auth', userRoutes);
 app.use('/api/sauces', sauceRoutes);
