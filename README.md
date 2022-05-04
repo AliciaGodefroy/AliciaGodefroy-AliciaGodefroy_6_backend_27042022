@@ -11,7 +11,7 @@ Contruction d'une API sécurisée pour une application d'avis gastronomiques
 
 ## Mesures de sécurité mises en place sur l'API 
 
-* Hashage du mot de passe utilisateur avec bcrypt
+* Hashage du mot de passe utilisateur avec __bcrypt__
 * Chiffrage des emails utilisateurs dans la base de données avec __crypto-js__
 * Manipulation sécurisée de la base de donnée __Mongoose__
 * Vérification que l’email utilisateur est unique dans la base de donnée avec __mongoose-unique-validator__
