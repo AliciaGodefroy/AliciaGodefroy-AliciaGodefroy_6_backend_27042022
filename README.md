@@ -12,10 +12,11 @@ Contruction d'une API sécurisée pour une application d'avis gastronomiques
 ## Mesures de sécurité mises en place sur l'API 
 
 * Hashage du mot de passe utilisateur avec bcrypt
-* Manipulation sécurisée de la base de donnée Mongoose
-* Vérification que l’email utilisateur est unique dans la base de donnée avec mongoose-unique-validator
-* Utilisation des variables d’environnement pour les données sensibles avec dotenv
-* Authentification de l’utilisateur par Token avec jsonwebtoken
-* Protection contre les attaques par brute-force avec express-rate-limit
-* Protection des headers avec helmet (problème photo) 🆘
-* Token d’authentification stocké dans un cookie côté client avec express-session 🆘
+* Chiffrage des emails utilisateurs dans la base de données avec __crypto-js__
+* Manipulation sécurisée de la base de donnée __Mongoose__
+* Vérification que l’email utilisateur est unique dans la base de donnée avec __mongoose-unique-validator__
+* Utilisation des variables d’environnement pour les données sensibles avec __dotenv__
+* Authentification de l’utilisateur par Token avec __jsonwebtoken__
+* Protection contre les attaques par brute-force avec __express-rate-limit__
+* Protection des headers avec __helmet__ (problème photo) 🆘
+* Token d’authentification stocké dans un cookie côté client avec __express-session__ 🆘

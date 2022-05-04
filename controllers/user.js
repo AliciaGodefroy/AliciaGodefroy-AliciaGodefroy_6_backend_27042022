@@ -1,14 +1,23 @@
+// Importation de bcrypt pour hasher le mot de passe
 const bcrypt = require ('bcrypt');
+// Importation de crypto-js pour chiffrer l'email
+const cryptojs = require('crypto-js');
+// Importation de jsonwebtoken pour les tokens d'authentification
 const jwt = require('jsonwebtoken');
+// Importation des variables d'environnement
+const dotenv = require('dotenv');
+dotenv.config();
 
 const User = require('../models/User');
 
 // Pour l'enregistrement de nouveaux utilisateurs
 exports.signup = (req, res, next) => {
+  // On chiffre l'email avant de l'envoyer dans la base de données
+  const emailCryptoJs = cryptojs.HmacSHA256(req.body.email, process.env.CRYPTOJS_EMAIL_KEY).toString();
   bcrypt.hash(req.body.password, 10)
     .then(hash => {
       const user = new User({
-        email: req.body.email,
+        email: emailCryptoJs,
         password: hash
       });
       user.save()
@@ -21,7 +30,8 @@ exports.signup = (req, res, next) => {
 
 // Pour la connexion
 exports.login = (req, res, next) => {
-  User.findOne({ email: req.body.email })
+  const emailCryptoJs = cryptojs.HmacSHA256(req.body.email, process.env.CRYPTOJS_EMAIL_KEY).toString();
+  User.findOne({ email: emailCryptoJs })
     .then(user => {
       if (!user) {
         return res.status(401).json({ error: 'Utilisateur non trouvé !' });
