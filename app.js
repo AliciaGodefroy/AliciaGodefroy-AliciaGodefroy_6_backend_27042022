@@ -40,7 +40,9 @@ app.use((req, res, next) => {
 app.use(bodyParser.json()); //Donne accès au corps de la requête
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
-
+helmet({
+  crossOriginResourcePolicy: false,
+}),
 
 app.use('/api/auth', userRoutes);
 app.use('/api/sauces', sauceRoutes);

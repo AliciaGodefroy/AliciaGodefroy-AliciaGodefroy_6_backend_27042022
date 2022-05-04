@@ -19,7 +19,7 @@ exports.signup = (req, res, next) => {
 };
 
 
-// Pour la connexionƒ
+// Pour la connexion
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
     .then(user => {
