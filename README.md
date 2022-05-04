@@ -1,13 +1,13 @@
-# P6 OpenClassrooms | API Backend Hot Takes pour la marque Piiquante
+# P6 OpenClassrooms - API Backend Hot Takes pour la marque Piiquante
 
 Contruction d'une API sécurisée pour une application d'avis gastronomiques
 
 ## Pour tester l'application
 
 1. Clôner le frontend de l'application disponible ici : https://github.com/OpenClassrooms-Student-Center/Web-Developer-P6
-2. Lancer le frontend en suivant les instructions disponibles sur son fichier README.md
-3. Clôner le backend disponible sur le repository actuel 
-4. Lancer le backend en exécutant _npm intall_ et _node server_
+2. Ouvrez un terminal et executez __npm install__ et __npm start__ à partir du répertoire du projet 
+3. Clôner le backend disponible sur le repository actuel 📍
+4. Lancer le backend en exécutant __npm intall__ et __node server__
 
 ## Mesures de sécurité mises en place sur l'API 
 
