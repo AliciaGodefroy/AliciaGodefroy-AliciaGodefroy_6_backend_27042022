@@ -2,6 +2,7 @@
 
 const Sauce = require ('../models/sauce');
 const fs = require('fs');
+const sauce = require('../models/sauce');
 
 //Pour créer un objet
 exports.createSauce = (req, res, next) => {
@@ -22,26 +23,39 @@ exports.createSauce = (req, res, next) => {
 
 //Pour modifier un objet
 exports.modifySauce = (req, res, next) => {
-  const sauceObject = req.file ?
+  Sauce.findOne({ _id: req.params.id })
+  .then((sauce)=>{
+    const sauceObject = req.file ?
     {
       ...JSON.parse(req.body.sauce),
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
-  Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-    .then(() => res.status(200).json({ message: 'Sauce modifiée !'}))
-    .catch(error => res.status(400).json({ error }));
+    // On vérifie l'userId
+    if(sauceObject.userId === sauce.userId){
+       Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+      .then(() => res.status(200).json({ message: 'Sauce modifiée !'}))
+       .catch(error => res.status(400).json({ error }));
+    }
+    else {
+      res.status(401).json({ error: "vous n'êtes pas autorisé à modifier cette sauce" });
+    }
+  })
 };
 
 //Pour supprimer un objet
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
-      const filename = sauce.imageUrl.split('/images/')[1];
-      fs.unlink(`images/${filename}`, () => {
-        Sauce.deleteOne({ _id: req.params.id })
-          .then(() => res.status(200).json({ message: 'Sauce supprimée !'}))
-          .catch(error => res.status(400).json({ error }));
-      });
+      if (sauce.userId === req.token.userId) {
+        const filename = sauce.imageUrl.split('/images/')[1];
+        fs.unlink(`images/${filename}`, () => {
+          Sauce.deleteOne({ _id: req.params.id })
+            .then(() => res.status(200).json({ message: 'Sauce supprimée !'}))
+            .catch(error => res.status(400).json({ error }));
+        });
+      } else{
+        res.status(401).json({ error: "vous n'êtes pas autorisé à supprimer cette sauce" });
+      }
     })
     .catch(error => res.status(500).json({ error }));
 };
@@ -84,7 +98,9 @@ exports.likeDislikeSauce = (req, res, next) => {
   let userId = req.body.userId // On récupère l'userId
   let sauceId = req.params.id // On récupère l'id de la sauce
 
-  // Utilisation de la structure conditionnelle Switch/Case (qui permet de sélectionner un ensemble d’instructions à exécuter en fonction de la valeur d’une variable)
+  // Utilisation de la structure conditionnelle Switch/Case 
+  //(qui permet de sélectionner un ensemble d’instructions à exécuter 
+  //en fonction de la valeur d’une variable)
   
   switch (like) {
     case 1 : // Pour ajouter un like 
