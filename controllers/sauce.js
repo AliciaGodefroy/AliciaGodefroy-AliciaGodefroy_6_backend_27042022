@@ -1,8 +1,11 @@
+const jwt = require('jsonwebtoken');
+const dotenv = require("dotenv");
+dotenv.config();
+
 // LOGIQUE METIER
 
 const Sauce = require ('../models/sauce');
 const fs = require('fs');
-const sauce = require('../models/sauce');
 
 //Pour créer un objet
 exports.createSauce = (req, res, next) => {
@@ -23,41 +26,48 @@ exports.createSauce = (req, res, next) => {
 
 //Pour modifier un objet
 exports.modifySauce = (req, res, next) => {
-  Sauce.findOne({ _id: req.params.id })
-  .then((sauce)=>{
-    const sauceObject = req.file ?
-    {
-      ...JSON.parse(req.body.sauce),
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    } : { ...req.body };
-    // On vérifie l'userId
-    if(sauceObject.userId === sauce.userId){
-       Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
-      .then(() => res.status(200).json({ message: 'Sauce modifiée !'}))
-       .catch(error => res.status(400).json({ error }));
+  Sauce.findOne({ _id: req.params.id }).then((data)=> {
+    if (data.userId == req.body.userId) {
+      console.log("meme user it's good")
+      const sauceObject = req.file ?
+        {
+          ...JSON.parse(req.body.sauce),
+          imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        } : { ...req.body };
+      Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+        .then(() => res.status(200).json({ message: 'Sauce modifiée !'}))
+        .catch(error => res.status(400).json({ error }));
     }
     else {
-      res.status(401).json({ error: "vous n'êtes pas autorisé à modifier cette sauce" });
+      res.status(401).json({ message: "Vous n'avez pas la permission !"})
     }
   })
+  
+
+  
 };
 
 //Pour supprimer un objet
 exports.deleteSauce = (req, res, next) => {
-  Sauce.findOne({ _id: req.params.id })
+  console.log('req.header', req.headers.authorization)
+  // recuperer le token dans la chaine de string (enlever le mot bearer et l'espace)
+  const token = req.headers.authorization.split(' ')[1];
+  const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
+  const userId = decodedToken.userId;
+  if (req.body.userId && req.body.userId !== userId) {
+    res.status(401).json({ message: "Vous n'avez pas la permission !"})
+  } else {
+    Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
-      if (sauce.userId === req.token.userId) {
-        const filename = sauce.imageUrl.split('/images/')[1];
-        fs.unlink(`images/${filename}`, () => {
-          Sauce.deleteOne({ _id: req.params.id })
-            .then(() => res.status(200).json({ message: 'Sauce supprimée !'}))
-            .catch(error => res.status(400).json({ error }));
-        });
-      } else{
-        res.status(401).json({ error: "vous n'êtes pas autorisé à supprimer cette sauce" });
-      }
+      const filename = sauce.imageUrl.split('/images/')[1];
+      fs.unlink(`images/${filename}`, () => {
+        Sauce.deleteOne({ _id: req.params.id })
+          .then(() => res.status(200).json({ message: 'Sauce supprimée !'}))
+          .catch(error => res.status(400).json({ error }));
+      });
     })
     .catch(error => res.status(500).json({ error }));
+  }
 };
 
 //Pour récupérer un seul objet
