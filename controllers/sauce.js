@@ -26,9 +26,15 @@ exports.createSauce = (req, res, next) => {
 
 //Pour modifier un objet
 exports.modifySauce = (req, res, next) => {
-  Sauce.findOne({ _id: req.params.id }).then((data)=> {
-    if (data.userId == req.body.userId) {
-      // console.log("meme user it's good")
+  // recuperer le token dans la chaine de string (enlever le mot bearer et l'espace)
+  const token = req.headers.authorization.split(' ')[1];
+  const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
+  const decodedUserId = decodedToken.userId;
+  Sauce.findOne({ _id: req.params.id }).then((data)=>{
+    // On compare l'userId de la sauce avec l'userId du Token
+    if (data.userId == decodedUserId) {
+      console.log('data.userId', data.userId)
+      console.log('decodedUserId', decodedUserId)
       const sauceObject = req.file ?
         {
           ...JSON.parse(req.body.sauce),
