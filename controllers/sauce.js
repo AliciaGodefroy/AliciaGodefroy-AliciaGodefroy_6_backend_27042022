@@ -28,7 +28,7 @@ exports.createSauce = (req, res, next) => {
 exports.modifySauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then((data)=> {
     if (data.userId == req.body.userId) {
-      console.log("meme user it's good")
+      // console.log("meme user it's good")
       const sauceObject = req.file ?
         {
           ...JSON.parse(req.body.sauce),
@@ -49,15 +49,16 @@ exports.modifySauce = (req, res, next) => {
 
 //Pour supprimer un objet
 exports.deleteSauce = (req, res, next) => {
-  console.log('req.header', req.headers.authorization)
+  // console.log('req.header', req.headers.authorization)
   // recuperer le token dans la chaine de string (enlever le mot bearer et l'espace)
   const token = req.headers.authorization.split(' ')[1];
   const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
-  const userId = decodedToken.userId;
-  if (req.body.userId && req.body.userId !== userId) {
-    res.status(401).json({ message: "Vous n'avez pas la permission !"})
-  } else {
-    Sauce.findOne({ _id: req.params.id })
+  const decodedUserId = decodedToken.userId;
+  Sauce.findOne({ _id: req.params.id }).then((data)=>{
+    if (data.userId == decodedUserId) {
+      // console.log('data.userId', data.userId)
+      // console.log('decodedUserId', decodedUserId)
+      Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
       const filename = sauce.imageUrl.split('/images/')[1];
       fs.unlink(`images/${filename}`, () => {
@@ -67,7 +68,11 @@ exports.deleteSauce = (req, res, next) => {
       });
     })
     .catch(error => res.status(500).json({ error }));
-  }
+    } 
+    else {
+      res.status(401).json({ message: "Vous n'avez pas la permission !"})
+    }
+  })
 };
 
 //Pour récupérer un seul objet
